@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/resources/axios.js"></script>
+    <script>
+        window.onload=()=>{
+            axios({
+                url:"./allBook",
+                method:"get"
+            }).then(res=>{
+                console.log(res.data);
+            });
+        }
+    </script>
+</head>
+<body>
+    <table>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
