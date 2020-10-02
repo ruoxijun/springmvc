@@ -38,45 +38,74 @@ public class BookController {
         return "data";
     }
 
+    /* // 1.使用getInputStream获取流，保存文件
     @RequestMapping(value = "/file")
+    // 将input的name为file的值传递给CommonsMultipartFile对象
     public String file(@RequestParam(value = "file") CommonsMultipartFile file,
                        HttpServletRequest request) throws IOException {
+        // 获取文件名
         String fileName = file.getOriginalFilename();
+        // 创建存放文件的未文件夹
         File path = new File(request.getServletContext().getRealPath("/file"));
         if (!path.exists()){
             path.mkdir();
-            System.out.println("文件夹创建成功");
         }
-        File filePath = new File(path,fileName);
+        // 获取上传文件的文件流
         InputStream in = file.getInputStream();
+        // 存放文件
+        File filePath = new File(path,fileName);
         OutputStream out = new FileOutputStream(filePath);
         int len = 0;
         byte[] buffer = new byte[1024];
         while ((len = in.read(buffer))!=-1){
             out.write(buffer,0,len);
-            System.out.println("写入文件："+len+"字节");
             out.flush();
         }
         out.close();
         in.close();
         return "redirect:/";
     }
+     */
+
+    // 2.使用transferTo方法，保存文件
+    @RequestMapping(value = "/file")
+    public String file(@RequestParam(value = "file") CommonsMultipartFile file,
+                       HttpServletRequest request) throws IOException {
+        // 获取文件名
+        String fileName = file.getOriginalFilename();
+        // 创建存放文件的未文件夹
+        File path = new File(request.getServletContext().getRealPath("/file"));
+        if (!path.exists()){
+            path.mkdir();
+        }
+        // 存放文件
+        File filePath = new File(path,fileName);
+        file.transferTo(filePath);
+        return "redirect:/";
+    }
 
     @RequestMapping(value = "/download")
-    public String file(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public String file(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        // 设置页面不缓存,清空buffer
         response.reset();
+        // 设置字符编码
+        response.setCharacterEncoding("utf-8");
+        // 二进制传输数据
         response.setContentType("multipart/form-data");
+        // 设置响应头
         response.setHeader("Content-Disposition","attachment;fileName="+
                 URLEncoder.encode("wallhaven-eyg6l8.jpg","utf-8"));
+        // 读取文件
         File path = new File(request.getServletContext().getRealPath("/file"));
         File filePath = new File(path,"wallhaven-eyg6l8.jpg");
         InputStream in = new FileInputStream(filePath);
+        // 获取传输文件输出流
         OutputStream out = response.getOutputStream();
         int len = 0;
         byte[] buffer = new byte[1024];
         while ((len = in.read(buffer))!=-1){
             out.write(buffer,0,len);
-            System.out.println("写出文件："+len+"字节");
             out.flush();
         }
         out.close();
